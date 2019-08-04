@@ -34,7 +34,7 @@ parser.add_argument('--weight_decay', type=float, default=5e-4,
 args = parser.parse_args()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+print("using device:", device)
 
 def train(n_epoch, trainloader):
     vgg_model = VGGNet(requires_grad=True, remove_fc=True)
@@ -52,13 +52,11 @@ def train(n_epoch, trainloader):
             images = images.float()
             labels = sample['label']
             labels = labels.float()
-            images = Variable(images)
-            labels = Variable(labels, requires_grad=False)
+            images = Variable(images.cuda())
+            labels = Variable(labels.cuda(), requires_grad=False)
 
             optimizer.zero_grad()
             output = model(images)
-            print("output size", output.size())
-            print("label size", labels.size())
             output = torch.sigmoid(output)
             loss = criterion(output, labels)
             loss.backward()
