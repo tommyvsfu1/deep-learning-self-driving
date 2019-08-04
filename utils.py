@@ -91,8 +91,22 @@ def gen_test_output(n_class, testloader, model, test_folder):
             yield test_paths[i], output
 
 def save_inference_samples(output_dir, testloader, model, test_folder):
-    print('Training Finished. Saving test images to: {}'.format(output_dir))
+    print('Saving test images to: {}'.format(output_dir))
     image_outputs = gen_test_output(2, testloader, model, test_folder)
     for name, image in image_outputs:
         plt.imsave(os.path.join(output_dir, name), image)
 
+def save_model(model, save_path='./checkpoint/'):
+    print('save model to', save_path)
+    folder = save_path
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    torch.save(model.state_dict(), save_path + 'seg.cpt')
+
+def load_model(model, load_path='./checkpoint/'):
+    print('load model from', load_path)
+    if torch.cuda.is_available():
+        model.load_state_dict(torch.load(load_path + 'seg.cpt'))
+    else:
+        model.load_state_dict(torch.load(load_path + 'seg.cpt', map_location=lambda storage, loc: storage))
+    return model

@@ -11,7 +11,7 @@ import numpy as np
 import os
 import argparse
 from kitti_loader import load_Kitti, load_Kitti_test
-from utils import save_inference_samples
+from utils import save_inference_samples, save_model, load_model
 np.random.seed(1234)
 
 
@@ -45,39 +45,43 @@ def train(n_epoch, trainloader):
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr,
                                 momentum=args.momentum, weight_decay=args.weight_decay)
     criterion = nn.BCELoss()
-    """
-    for epoch in range(n_epoch):
-        running_loss = 0.0
-        for i, data in enumerate(trainloader):
-            sample = data
-            images = sample['image']
-            images = images.float()
-            labels = sample['label']
-            labels = labels.float()
-            images = Variable(images.cuda())
-            labels = Variable(labels.cuda(), requires_grad=False)
+    # for epoch in range(n_epoch):
+    #     running_loss = 0.0
+    #     for i, data in enumerate(trainloader):
+    #         sample = data
+    #         images = sample['image']
+    #         images = images.float()
+    #         labels = sample['label']
+    #         labels = labels.float()
+    #         images = Variable(images.cuda())
+    #         labels = Variable(labels.cuda(), requires_grad=False)
 
-            optimizer.zero_grad()
-            output = model(images)
-            output = torch.sigmoid(output)
-            loss = criterion(output, labels)
-            loss.backward()
-            optimizer.step()
+    #         optimizer.zero_grad()
+    #         output = model(images)
+    #         output = torch.sigmoid(output)
+    #         loss = criterion(output, labels)
+    #         loss.backward()
+    #         optimizer.step()
 
-            running_loss += loss.item()
-            if i % 10 == 9:    # print every 10 mini-batches
-                print('Epoch: %d, Loss: %.4f' %
-                      (epoch + 1, running_loss / 10))
-                running_loss = 0.0
-    """
+    #         running_loss += loss.item()
+    #         if i % 10 == 9:    # print every 10 mini-batches
+    #             print('Epoch: %d, Loss: %.4f' %
+    #                   (epoch + 1, running_loss / 10))
+    #             running_loss = 0.0
     return model
 
-def main():
+def run():
     kitti_train_loader = load_Kitti(args.batch_size)
-    kitti_test_loader = load_Kitti_test(batch_size=1)
     print("Training model..")
     model = train(args.epochs, kitti_train_loader)
     print("Completed training!")
+    save_model(model)
+
+def testing():
+    vgg_model = VGGNet(requires_grad=True, remove_fc=True)
+    model = FCNs(pretrained_net=vgg_model, n_class=2).to(device)
+    model = load_model(model)
+    kitti_test_loader = load_Kitti_test(batch_size=1)
     print("Starting inference...")
     test_folder = "data/data_road/testing/image_2/"
     if not os.path.exists(args.output_dir):
@@ -85,8 +89,5 @@ def main():
     save_inference_samples(args.output_dir, kitti_test_loader,
                             model, test_folder)
     print("Inference completed!")
-def testing():
-    pass
-
 if __name__ == "__main__":
-    main()
+    run()
