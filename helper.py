@@ -74,6 +74,18 @@ def get_csv_file(data_folder):
         for image, label in label_paths.items():
             writer.writerow([image, label])
 
+def get_csv_test_file(data_folder):
+    image_paths = glob(os.path.join(data_folder, 'image_2', '*.png'))
+
+    import csv
+
+    # 開啟輸出的 CSV 檔案
+    with open('test.csv', 'w', newline='') as csvfile:
+        # 建立 CSV 檔寫入器
+        writer = csv.writer(csvfile)
+        for image in image_paths:
+            writer.writerow([os.path.basename(image)])
+
 def gen_batch_function(data_folder, image_shape):
     """
     Generate function to create batches of training data
@@ -197,6 +209,6 @@ def pred_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input
 #     # print("type of label:", label.shape)
 
 data_dir = './data'
-train_dir = os.path.join(data_dir, 'data_road/training')
-get_csv_file(train_dir)
+train_dir = os.path.join(data_dir, 'data_road/testing/')
+get_csv_test_file(train_dir)
 

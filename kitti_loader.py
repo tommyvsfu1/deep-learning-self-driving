@@ -76,3 +76,51 @@ def load_Kitti(batch_size):
 
     return dataloader
 
+
+
+class KittiTestDataset(Dataset):
+    """Face Landmarks dataset."""
+
+    def __init__(self, csv_file, root_dir, transform=None):
+        """
+        Args:
+            csv_file (string): Path to the csv file with annotations.
+            root_dir (string): Directory with all the images.
+            transform (callable, optional): Optional transform to be applied
+                on a sample.
+        """
+        self.frame = pd.read_csv(csv_file)
+        self.root_dir = root_dir
+        self.transform = transform
+    def __len__(self):
+        return len(self.frame)
+
+    def __getitem__(self, idx):
+    
+        image_prefix = self.root_dir + "image_2/"
+        image_name = str(self.frame.iloc[idx, 0]) 
+
+        img_name = os.path.join(image_prefix,image_name)
+        raw_image = imread(img_name) # read as np.array
+        image = Image.fromarray(raw_image) # convert to PIL image(Pytorch default image datatype)
+        if self.transform:
+            image = self.transform(image)
+        sample = {'image':image, 'name':img_name}
+        return sample
+
+def load_Kitti_test(batch_size):
+
+    data_transforms = transforms.Compose([
+            transforms.Resize((256,256)),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ])
+
+    dataset = KittiTestDataset('data/test.csv','data/data_road/testing/',transform=data_transforms)
+
+    dataloader = DataLoader(dataset, batch_size=batch_size,
+                        shuffle=True, num_workers=4)
+
+    return dataloader
+
+
