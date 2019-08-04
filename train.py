@@ -45,29 +45,29 @@ def train(n_epoch, trainloader):
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr,
                                 momentum=args.momentum, weight_decay=args.weight_decay)
     criterion = nn.BCELoss()
-    # for epoch in range(n_epoch):
-    #     running_loss = 0.0
-    #     for i, data in enumerate(trainloader):
-    #         sample = data
-    #         images = sample['image']
-    #         images = images.float()
-    #         labels = sample['label']
-    #         labels = labels.float()
-    #         images = Variable(images.cuda())
-    #         labels = Variable(labels.cuda(), requires_grad=False)
+    for epoch in range(n_epoch):
+        running_loss = 0.0
+        for i, data in enumerate(trainloader):
+            sample = data
+            images = sample['image']
+            images = images.float()
+            labels = sample['label']
+            labels = labels.float()
+            images = Variable(images.cuda())
+            labels = Variable(labels.cuda(), requires_grad=False)
 
-    #         optimizer.zero_grad()
-    #         output = model(images)
-    #         output = torch.sigmoid(output)
-    #         loss = criterion(output, labels)
-    #         loss.backward()
-    #         optimizer.step()
+            optimizer.zero_grad()
+            output = model(images)
+            output = torch.sigmoid(output)
+            loss = criterion(output, labels)
+            loss.backward()
+            optimizer.step()
 
-    #         running_loss += loss.item()
-    #         if i % 10 == 9:    # print every 10 mini-batches
-    #             print('Epoch: %d, Loss: %.4f' %
-    #                   (epoch + 1, running_loss / 10))
-    #             running_loss = 0.0
+            running_loss += loss.item()
+            if i % 10 == 9:    # print every 10 mini-batches
+                print('Epoch: %d, Loss: %.4f' %
+                      (epoch + 1, running_loss / 10))
+                running_loss = 0.0
     return model
 
 def run():
