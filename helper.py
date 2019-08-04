@@ -58,6 +58,22 @@ def maybe_download_pretrained_vgg(data_dir):
         os.remove(os.path.join(vgg_path, vgg_filename))
 
 
+def get_csv_file(data_folder):
+    image_paths = glob(os.path.join(data_folder, 'image_2', '*.png'))
+    label_paths = {
+        re.sub(r'_(lane|road)_', '_', os.path.basename(path)): os.path.basename(path)
+        for path in glob(os.path.join(data_folder, 'gt_image_2', '*_road_*.png'))}
+
+
+    import csv
+
+    # 開啟輸出的 CSV 檔案
+    with open('train.csv', 'w', newline='') as csvfile:
+        # 建立 CSV 檔寫入器
+        writer = csv.writer(csvfile)
+        for image, label in label_paths.items():
+            writer.writerow([image, label])
+
 def gen_batch_function(data_folder, image_shape):
     """
     Generate function to create batches of training data
@@ -73,8 +89,20 @@ def gen_batch_function(data_folder, image_shape):
         """
         image_paths = glob(os.path.join(data_folder, 'image_2', '*.png'))
         label_paths = {
-            re.sub(r'_(lane|road)_', '_', os.path.basename(path)): path
+            re.sub(r'_(lane|road)_', '_', os.path.basename(path)): os.path.basename(path)
             for path in glob(os.path.join(data_folder, 'gt_image_2', '*_road_*.png'))}
+
+
+        import csv
+
+        # 開啟輸出的 CSV 檔案
+        with open('output.csv', 'w', newline='') as csvfile:
+            # 建立 CSV 檔寫入器
+            writer = csv.writer(csvfile)
+            for image, label in label_paths.items():
+                writer.writerow([image, label])
+
+        print("after")
         background_color = np.array([255, 0, 0])
 
         random.shuffle(image_paths)
@@ -90,12 +118,20 @@ def gen_batch_function(data_folder, image_shape):
 
                 gt_bg = np.all(gt_image == background_color, axis=2) # get backgroud feature map
                 gt_bg = gt_bg.reshape(*gt_bg.shape, 1)  # expand dim
-                gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2) # get gt feature map(use reverse background)
+
+                # get ground truth
+                # tricks: since we only want 2 class (background and road)
+                # so use invert(background), we can get road feature map
+                gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2) 
                 
+
 
                 images.append(image)
                 gt_images.append(gt_image)
 
+            
+            
+            
             yield np.array(images), np.array(gt_images)
     return get_batches_fn
 
@@ -152,10 +188,15 @@ def pred_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input
 
 
 
-image_shape = (160, 576)
+# image_shape = (160, 576)
+# data_dir = './data'
+# get_batches_fn = gen_batch_function(os.path.join(data_dir, 'data_road/training'), image_shape)
+# for image, label in get_batches_fn(1):
+#     pass
+#     # print("type of image:", image.shape)
+#     # print("type of label:", label.shape)
+
 data_dir = './data'
-get_batches_fn = gen_batch_function(os.path.join(data_dir, 'data_road/training'), image_shape)
-for image, label in get_batches_fn(1):
-    pass
-    # print("type of image:", image.shape)
-    # print("type of label:", label.shape)
+train_dir = os.path.join(data_dir, 'data_road/training')
+get_csv_file(train_dir)
+

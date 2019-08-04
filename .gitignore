@@ -1,3 +1,6 @@
-data/
+data/data_road/
+data/training_mapping/
+data/devkit_road/
 reference_code/
+__pycache__/
 
