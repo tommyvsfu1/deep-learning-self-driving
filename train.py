@@ -90,4 +90,4 @@ def testing():
                             model, test_folder)
     print("Inference completed!")
 if __name__ == "__main__":
-    run()
+    testing()
