@@ -5,4 +5,5 @@ data/data_road.zip
 reference_code/
 result/
 __pycache__/
+nohup.out
 
