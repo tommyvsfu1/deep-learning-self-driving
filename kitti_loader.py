@@ -153,7 +153,7 @@ class KittiTestDataset(Dataset):
 
     def __getitem__(self, idx):
     
-        image_prefix = self.root_dir + "image_2/"
+        image_prefix = self.root_dir 
         image_name = str(self.frame.iloc[idx, 0]) 
 
         img_name = os.path.join(image_prefix,image_name)
@@ -167,18 +167,33 @@ class KittiTestDataset(Dataset):
 def load_Kitti_test(batch_size):
 
     data_transforms = transforms.Compose([
-            transforms.Resize((256,256)),
+            transforms.Resize((160,576)),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
 
-    dataset = KittiTestDataset('data/test.csv','data/data_road/testing/',transform=data_transforms)
+    dataset = KittiTestDataset('data/test.csv','data/data_road/testing/image_2/',transform=data_transforms)
 
     dataloader = DataLoader(dataset, batch_size=batch_size,
                         shuffle=True, num_workers=4)
 
     return dataloader
 
+def load_Kitti_raw_test(batch_size):
+
+    data_transforms = transforms.Compose([
+            transforms.Resize((160,576)),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ])
+
+    dataset = KittiTestDataset('raw_test/2011_09_26/2011_09_26_drive_0002_sync/image_02/raw_test.csv',
+                                'raw_test/2011_09_26/2011_09_26_drive_0002_sync/image_02/data/',transform=data_transforms)
+
+    dataloader = DataLoader(dataset, batch_size=batch_size,
+                        shuffle=True, num_workers=4)
+
+    return dataloader
 
 
 def perform_augmentation(batch_x):

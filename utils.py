@@ -98,7 +98,7 @@ def gen_test_output(n_class, testloader, model, test_folder):
 
 
             image_file = data['name'][0]
-            raw_image = image = scipy.misc.imresize(scipy.misc.imread(image_file), (256,256))
+            raw_image = image = scipy.misc.imresize(scipy.misc.imread(image_file), (160,576))
             mask = np.dot(segmentation, np.array([[0, 255, 255, 127]]))
             mask = scipy.misc.toimage(mask, mode="RGBA")
             street_im = scipy.misc.toimage(raw_image)
@@ -120,10 +120,25 @@ def save_model(model, name='seg.cpt', save_path='./checkpoint/'):
         os.makedirs(folder)
     torch.save(model.state_dict(), save_path + name)
 
-def load_model(model, load_path='./checkpoint/'):
+def load_model(model, load_path='./checkpoint/pretrained/'):
     print('load model from', load_path)
     if torch.cuda.is_available():
         model.load_state_dict(torch.load(load_path + 'seg.cpt'))
     else:
         model.load_state_dict(torch.load(load_path + 'seg.cpt', map_location=lambda storage, loc: storage))
     return model
+
+def get_csv_test_file(data_folder):
+    image_paths = sorted(glob(os.path.join(data_folder, '*.png')))
+
+    import csv
+
+    # 開啟輸出的 CSV 檔案
+    with open('raw_test.csv', 'w', newline='') as csvfile:
+        # 建立 CSV 檔寫入器
+        writer = csv.writer(csvfile)
+        for image in image_paths:
+            writer.writerow([os.path.basename(image)])
+
+
+# get_csv_test_file('/Users/tommy/self-driving/raw_test/2011_09_26/2011_09_26_drive_0002_sync/image_02/data/')

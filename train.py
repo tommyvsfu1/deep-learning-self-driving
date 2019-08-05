@@ -10,7 +10,7 @@ from fcn import VGGNet, FCN32s, FCN16s, FCN8s, FCNs
 import numpy as np
 import os
 import argparse
-from kitti_loader import load_Kitti, load_Kitti_test
+from kitti_loader import load_Kitti, load_Kitti_test, load_Kitti_raw_test
 from utils import save_inference_samples, save_model, load_model
 from scipy.misc import imread
 import sys
@@ -168,6 +168,20 @@ def testing():
                             model, test_folder)
     print("Inference completed!")
 
+def raw_testing():
+    vgg_model = VGGNet(requires_grad=True, remove_fc=True)
+    model = FCNs(pretrained_net=vgg_model, n_class=2).to(device)
+    model = load_model(model)
+    # kitti_test_loader = load_Kitti_test(batch_size=1)
+    kitti_raw_test_loader = load_Kitti_raw_test(batch_size=1)
+    print("Starting inference...")
+    test_folder = "raw_test/2011_09_26/2011_09_26_drive_0002_sync/image_02/data/"
+    if not os.path.exists(args.output_dir):
+        os.makedirs(args.output_dir)
+    save_inference_samples(args.output_dir, kitti_raw_test_loader,
+                            model, test_folder)
+    print("Inference completed!")
+
 def validation():
     kitti_train_loader = load_Kitti(batch_size=1)
     print("Training model..")
@@ -178,4 +192,10 @@ def validation():
     print("Completed validation!")
     # save_model(model)
 if __name__ == "__main__":
-    run()
+    # train data
+    # run()
+    # test data
+    # testing()
+
+    # test 'raw' video data
+    raw_testing()
