@@ -201,7 +201,6 @@ def perform_augmentation(batch_x):
         return x[:, ::-1, :]
 
     def augment_in_hsv_space(x_hsv):
-        print("x_hsv shape", x_hsv.shape)
         x_hsv = np.float32(cv2.cvtColor(x_hsv, cv2.COLOR_RGB2HSV))
         x_hsv[:, :, 0] = x_hsv[:, :, 0] * random.uniform(0.9, 1.1)   # change hue
         x_hsv[:, :, 1] = x_hsv[:, :, 1] * random.uniform(0.5, 2.0)   # change saturation
