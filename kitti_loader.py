@@ -43,8 +43,7 @@ class KittiDataset(Dataset):
         image_name = str(self.frame.iloc[idx, 0]) 
         gt_name = str(self.frame.iloc[idx, 1])
 
-        img_name = os.path.join(image_prefix,image_name)
-        image = imread(img_name) # read as np.array
+
 
         background_color = np.array([255, 0, 0])
         gt_name = os.path.join(gt_prefix,gt_name)
@@ -59,6 +58,8 @@ class KittiDataset(Dataset):
         gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2) 
         # gt_image = Image.fromarray(gt_image)
         gt_map = np.invert(gt_bg) 
+
+
 
         # if self.crop:
         #     h, w, _ = image.shape
@@ -75,6 +76,12 @@ class KittiDataset(Dataset):
 
         gt_image = gt_image.transpose((2,0,1))
         gt_image = gt_image.astype("float")
+
+        img_name = os.path.join(image_prefix,image_name)
+        image = cv2.imread(img_name) # read as np.array
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # HSV augmentation
+        image = perform_augmentation(image)
         image = Image.fromarray(image) # convert to PIL image(Pytorch default image datatype)
         sample = {'image': image.copy(), 'label': torch.from_numpy(gt_image.copy()), 'gt_map':torch.from_numpy(gt_map.copy())}
 
@@ -174,4 +181,37 @@ def load_Kitti_test(batch_size):
 
 
 
-load_Kitti(1)
+def perform_augmentation(batch_x):
+    """
+    Perform basic data augmentation on image batches.
+    
+    Parameters
+    ----------
+    batch_x: ndarray of shape (b, h, w, c)
+        Batch of images in RGB format, values in [0, 255]
+    batch_y: ndarray of shape (b, h, w, c)
+        Batch of ground truth with road segmentation
+        
+    Returns
+    -------
+    batch_x_aug, batch_y_aug: two ndarray of shape (b, h, w, c)
+        Augmented batches
+    """
+    def mirror(x):
+        return x[:, ::-1, :]
+
+    def augment_in_hsv_space(x_hsv):
+        print("x_hsv shape", x_hsv.shape)
+        x_hsv = np.float32(cv2.cvtColor(x_hsv, cv2.COLOR_RGB2HSV))
+        x_hsv[:, :, 0] = x_hsv[:, :, 0] * random.uniform(0.9, 1.1)   # change hue
+        x_hsv[:, :, 1] = x_hsv[:, :, 1] * random.uniform(0.5, 2.0)   # change saturation
+        x_hsv[:, :, 2] = x_hsv[:, :, 2] * random.uniform(0.5, 2.0)   # change brightness
+        x_hsv = np.uint8(np.clip(x_hsv, 0, 255))
+        return cv2.cvtColor(x_hsv, cv2.COLOR_HSV2RGB)
+
+    batch_x_aug = np.copy(batch_x)
+
+    # Random change in image values (hue, saturation, brightness)
+    batch_x_aug = augment_in_hsv_space(batch_x_aug)
+
+    return batch_x_aug
