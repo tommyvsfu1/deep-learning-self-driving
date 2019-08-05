@@ -10,6 +10,7 @@ import numpy as np
 from skimage import io, transform
 import matplotlib.pyplot as plt
 import scipy.misc
+from data.devkit_road.python.helper import evalExp
 
 np.random.seed(1234)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -59,6 +60,23 @@ def make_layers(cfg, batch_norm=False):
             in_channels = v
 
     return nn.Sequential(*layers)
+
+def eval_image(gt_image, cnn_image):
+    """."""
+    thresh = np.array(range(0, 256))/255.0
+
+    road_color = np.array([255,0,255])
+    background_color = np.array([255,0,0])
+    gt_road = np.all(gt_image == road_color, axis=2)
+    gt_bg = np.all(gt_image == background_color, axis=2)
+    valid_gt = gt_road + gt_bg
+
+    FN, FP, posNum, negNum = evalExp(gt_road, cnn_image,
+                                         thresh, validMap=None,
+                                         validArea=valid_gt)
+
+    return FN, FP, posNum, negNum
+
 
 def gen_test_output(n_class, testloader, model, test_folder):
     model.eval();

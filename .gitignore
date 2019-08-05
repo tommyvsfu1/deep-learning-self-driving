@@ -6,4 +6,5 @@ reference_code/
 result/
 __pycache__/
 nohup.out
+scores/
 

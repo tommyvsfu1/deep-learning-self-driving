@@ -10,7 +10,8 @@ from torchvision import transforms, utils
 from scipy.misc import imread
 from PIL import Image
 import cv2
-
+import sys
+np.set_printoptions(threshold=sys.maxsize)
 class KittiDataset(Dataset):
     """Face Landmarks dataset."""
 
@@ -54,7 +55,8 @@ class KittiDataset(Dataset):
         gt_image = gt_image.astype("float")
 
         # gt_image = Image.fromarray(gt_image)
-        sample = {'image': image, 'label': torch.from_numpy(gt_image)}
+        gt_map = np.invert(gt_bg) 
+        sample = {'image': image, 'label': torch.from_numpy(gt_image), 'gt_map':torch.from_numpy(gt_map)}
 
         if self.transform:
             sample['image'] = self.transform['train_x'](sample['image'])
@@ -122,5 +124,6 @@ def load_Kitti_test(batch_size):
                         shuffle=True, num_workers=4)
 
     return dataloader
+
 
 
