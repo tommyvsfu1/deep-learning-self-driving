@@ -68,17 +68,18 @@ def read_time_stamp(file_name):
 
 def output_video(fps):
     img_array = []
-    for filename in glob.glob('C:/New folder/Images/*.jpg'):
+    for filename in sorted(glob.glob('./raw_result/*.png')):
         img = cv2.imread(filename)
         height, width, layers = img.shape
         size = (width,height)
         img_array.append(img)
     
     
-    out = cv2.VideoWriter('project.avi',cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
+    out = cv2.VideoWriter('project.mp4',cv2.VideoWriter_fourcc(*'MP4V'), fps, size)
     
     for i in range(len(img_array)):
         out.write(img_array[i])
     out.release()
 
 fps = read_time_stamp("./raw_test/2011_09_26/2011_09_26_drive_0002_sync/image_02/timestamps.txt")
+output_video(fps)

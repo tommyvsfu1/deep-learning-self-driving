@@ -191,7 +191,7 @@ def load_Kitti_raw_test(batch_size):
                                 'raw_test/2011_09_26/2011_09_26_drive_0002_sync/image_02/data/',transform=data_transforms)
 
     dataloader = DataLoader(dataset, batch_size=batch_size,
-                        shuffle=True, num_workers=4)
+                        shuffle=False, num_workers=4)
 
     return dataloader
 

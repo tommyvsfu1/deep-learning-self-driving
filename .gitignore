@@ -8,3 +8,4 @@ __pycache__/
 nohup.out
 scores/
 raw_test/
+raw_result/raw/

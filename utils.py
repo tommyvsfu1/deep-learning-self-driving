@@ -103,7 +103,7 @@ def gen_test_output(n_class, testloader, model, test_folder):
             mask = scipy.misc.toimage(mask, mode="RGBA")
             street_im = scipy.misc.toimage(raw_image)
             street_im.paste(mask, box=None, mask=mask)
-            test_paths = get_test_paths(test_folder)
+            test_paths = sorted(get_test_paths(test_folder))
             output = np.array(street_im)
             yield test_paths[i], output
 
