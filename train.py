@@ -56,7 +56,7 @@ def train(n_epoch, trainloader, val_loader):
                                 momentum=args.momentum, weight_decay=args.weight_decay)
     criterion = nn.BCELoss()
 
-
+    best_road_iou =  float('-inf')
     
     for epoch in range(n_epoch):
         running_loss = 0.0
@@ -83,7 +83,12 @@ def train(n_epoch, trainloader, val_loader):
                       (epoch + 1, running_loss / 10))
                 running_loss = 0.0
         # validation
-        val(model, val_loader, epoch)
+        ious = val(model, val_loader, epoch)
+        print("ious test 1", ious[1])
+        if ious[1] > best_road_iou and epoch > 150: # save model for best road iou
+            best_road_iou = ious[1]
+            save_model(model,name='best_seg.cpt')
+
     return model
 
 
@@ -119,7 +124,7 @@ def val(fcn_model, val_loader, epoch):
     np.save(os.path.join(score_dir, "meanIU"), IU_scores)
     pixel_scores[epoch] = pixel_accs
     np.save(os.path.join(score_dir, "meanPixel"), pixel_scores)
-
+    return ious
 
 # borrow functions and modify it from https://github.com/Kaixhin/FCN-semantic-segmentation/blob/master/main.py
 # Calculates class intersections over unions

@@ -113,12 +113,12 @@ def save_inference_samples(output_dir, testloader, model, test_folder):
     for name, image in image_outputs:
         plt.imsave(os.path.join(output_dir, name), image)
 
-def save_model(model, save_path='./checkpoint/'):
+def save_model(model, name='seg.cpt', save_path='./checkpoint/'):
     print('save model to', save_path)
     folder = save_path
     if not os.path.exists(folder):
         os.makedirs(folder)
-    torch.save(model.state_dict(), save_path + 'seg.cpt')
+    torch.save(model.state_dict(), save_path + name)
 
 def load_model(model, load_path='./checkpoint/'):
     print('load model from', load_path)
