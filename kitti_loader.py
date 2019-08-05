@@ -12,11 +12,13 @@ from scipy.misc import imread
 from PIL import Image
 import cv2
 import sys
+import random
+random.seed(11037)
 np.set_printoptions(threshold=sys.maxsize)
 class KittiDataset(Dataset):
     """Face Landmarks dataset."""
 
-    def __init__(self, csv_file, root_dir, transform=None):
+    def __init__(self, csv_file, root_dir, transform=None, crop=True, flip_rate=0.5):
         """
         Args:
             csv_file (string): Path to the csv file with annotations.
@@ -27,6 +29,10 @@ class KittiDataset(Dataset):
         self.frame = pd.read_csv(csv_file)
         self.root_dir = root_dir
         self.transform = transform
+        self.flip_rate = flip_rate
+        self.crop = crop
+        self.new_h = 256
+        self.new_w = 256
     def __len__(self):
         return len(self.frame)
 
@@ -39,35 +45,51 @@ class KittiDataset(Dataset):
 
         img_name = os.path.join(image_prefix,image_name)
         image = imread(img_name) # read as np.array
-        image = Image.fromarray(image) # convert to PIL image(Pytorch default image datatype)
+
 
         background_color = np.array([255, 0, 0])
         gt_name = os.path.join(gt_prefix,gt_name)
         # gt_image = scipy.misc.imread(gt_name)
         gt_image = imread(gt_name)
-        gt_image = cv2.resize(gt_image, (256,256))
+        # gt_image = cv2.resize(gt_image, (256,256))
         gt_bg = np.all(gt_image == background_color, axis=2) # get backgroud feature map
         gt_bg = gt_bg.reshape(*gt_bg.shape, 1)  # expand dim
         # get ground truth
         # tricks: since we only want 2 class (background and road)
         # so use invert(background), we can get road feature map
         gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2) 
-        gt_image = gt_image.transpose((2,0,1))
-        gt_image = gt_image.astype("float")
 
         # gt_image = Image.fromarray(gt_image)
         gt_map = np.invert(gt_bg) 
-        sample = {'image': image, 'label': torch.from_numpy(gt_image), 'gt_map':torch.from_numpy(gt_map)}
+
+        if self.crop:
+            h, w, _ = image.shape
+            top   = random.randint(0, h - self.new_h)
+            left  = random.randint(0, w - self.new_w)
+            image   = image[top:top + self.new_h, left:left + self.new_w]
+            gt_image = gt_image[top:top + self.new_h, left:left + self.new_w]
+            gt_map = gt_map[top:top + self.new_h, left:left + self.new_w]
+
+        if random.random() < self.flip_rate:
+            image   = np.fliplr(image)
+            gt_image = np.fliplr(gt_image)
+            gt_map = np.fliplr(gt_map)
+
+        gt_image = gt_image.transpose((2,0,1))
+        gt_image = gt_image.astype("float")
+        image = Image.fromarray(image) # convert to PIL image(Pytorch default image datatype)
+        print(image)
+        sample = {'image': image.copy(), 'label': torch.from_numpy(gt_image.copy()), 'gt_map':torch.from_numpy(gt_map.copy())}
 
         if self.transform:
             sample['image'] = self.transform['train_x'](sample['image'])
+
         return sample
 
 def load_Kitti(batch_size, split=True):
 
     data_transforms = {
         'train_x': transforms.Compose([
-            transforms.Resize((256,256)),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
