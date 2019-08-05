@@ -24,7 +24,7 @@ parser.add_argument('--output_dir', type=str, required=True,
                     help='output directory for test inference')
 parser.add_argument('--model', type=str, default='vgg19',
                     help='model architecture to be used for FCN')
-parser.add_argument('--epochs', type=int, default=400,
+parser.add_argument('--epochs', type=int, default=500,
                     help='num of training epochs')
 parser.add_argument('--n_class', type=int, default=2,
                     help='number of label classes')
@@ -52,8 +52,9 @@ def train(n_epoch, trainloader, val_loader):
     vgg_model = VGGNet(requires_grad=True, remove_fc=True)
     model = FCNs(pretrained_net=vgg_model, n_class=2).to(device)
     
-    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr,
-                                momentum=args.momentum, weight_decay=args.weight_decay)
+    #optimizer = torch.optim.SGD(model.parameters(), lr=args.lr,
+    #                            momentum=args.momentum, weight_decay=args.weight_decay)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     criterion = nn.BCELoss()
 
     best_road_iou =  float('-inf')
