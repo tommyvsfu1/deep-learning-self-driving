@@ -24,7 +24,7 @@ parser.add_argument('--output_dir', type=str, required=True,
                     help='output directory for test inference')
 parser.add_argument('--model', type=str, default='vgg19',
                     help='model architecture to be used for FCN')
-parser.add_argument('--epochs', type=int, default=100,
+parser.add_argument('--epochs', type=int, default=150,
                     help='num of training epochs')
 parser.add_argument('--n_class', type=int, default=2,
                     help='number of label classes')
