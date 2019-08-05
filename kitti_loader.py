@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from torch.utils.data import Dataset, DataLoader
 from torchvision import datasets
 from torchvision import transforms, utils
+from torch.utils.data.sampler import SubsetRandomSampler
 from scipy.misc import imread
 from PIL import Image
 import cv2
@@ -62,7 +63,7 @@ class KittiDataset(Dataset):
             sample['image'] = self.transform['train_x'](sample['image'])
         return sample
 
-def load_Kitti(batch_size):
+def load_Kitti(batch_size, split=True):
 
     data_transforms = {
         'train_x': transforms.Compose([
@@ -73,12 +74,39 @@ def load_Kitti(batch_size):
     }
     dataset = KittiDataset('data/train.csv','data/data_road/training/',transform=data_transforms)
 
-    dataloader = DataLoader(dataset, batch_size=batch_size,
-                        shuffle=True, num_workers=4)
 
-    return dataloader
+    if split:
+        train_dataloader, val_dataloader = datasetSplit(dataset=dataset, train_batch_size=batch_size)
+    else :
+        dataloader = DataLoader(dataset, batch_size=batch_size,
+                            shuffle=True, num_workers=4)
 
+    return train_dataloader, val_dataloader
 
+def datasetSplit(dataset, train_batch_size):
+    validation_split = .1
+    shuffle_dataset = True
+    random_seed= 42
+
+    # Creating data indices for training and validation splits:
+    dataset_size = len(dataset)
+    indices = list(range(dataset_size))
+    split = int(np.floor(validation_split * dataset_size))
+
+    if shuffle_dataset :
+        np.random.seed(random_seed)
+        np.random.shuffle(indices)
+    train_indices, val_indices = indices[split:], indices[:split]
+
+    train_sampler = SubsetRandomSampler(train_indices)
+    valid_sampler = SubsetRandomSampler(val_indices)
+
+    train_dataloader = torch.utils.data.DataLoader(dataset, batch_size=train_batch_size,
+                                                shuffle=False,num_workers=4,sampler=train_sampler)
+                
+    val_dataloader = torch.utils.data.DataLoader(dataset, batch_size=1,
+                                                shuffle=False,num_workers=4,sampler=valid_sampler)
+    return train_dataloader, val_dataloader
 
 class KittiTestDataset(Dataset):
     """Face Landmarks dataset."""

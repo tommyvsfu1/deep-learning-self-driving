@@ -49,7 +49,7 @@ if not os.path.exists(score_dir):
 IU_scores    = np.zeros((args.epochs, args.n_class))
 pixel_scores = np.zeros(args.epochs)
 
-def train(n_epoch, trainloader):
+def train(n_epoch, trainloader, val_loader):
     vgg_model = VGGNet(requires_grad=True, remove_fc=True)
     model = FCNs(pretrained_net=vgg_model, n_class=2).to(device)
     
@@ -84,7 +84,7 @@ def train(n_epoch, trainloader):
                       (epoch + 1, running_loss / 10))
                 running_loss = 0.0
         # validation
-        val(model, trainloader, epoch)
+        val(model, val_loader, epoch)
     return model
 
 
@@ -144,9 +144,9 @@ def pixel_acc(pred, target):
     return correct / total
 
 def run():
-    kitti_train_loader = load_Kitti(args.batch_size)
+    kitti_train_loader, kitti_val_loader = load_Kitti(args.batch_size)
     print("Training model..")
-    model = train(args.epochs, kitti_train_loader)
+    model = train(args.epochs, kitti_train_loader, kitti_val_loader)
     print("Completed training!")
     save_model(model)
 
@@ -173,4 +173,4 @@ def validation():
     print("Completed validation!")
     # save_model(model)
 if __name__ == "__main__":
-    pass
+    run()
