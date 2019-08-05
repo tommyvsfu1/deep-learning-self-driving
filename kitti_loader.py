@@ -51,7 +51,7 @@ class KittiDataset(Dataset):
         gt_name = os.path.join(gt_prefix,gt_name)
         # gt_image = scipy.misc.imread(gt_name)
         gt_image = imread(gt_name)
-        # gt_image = cv2.resize(gt_image, (256,256))
+        gt_image = cv2.resize(gt_image, (160,576))
         gt_bg = np.all(gt_image == background_color, axis=2) # get backgroud feature map
         gt_bg = gt_bg.reshape(*gt_bg.shape, 1)  # expand dim
         # get ground truth
@@ -62,23 +62,22 @@ class KittiDataset(Dataset):
         # gt_image = Image.fromarray(gt_image)
         gt_map = np.invert(gt_bg) 
 
-        if self.crop:
-            h, w, _ = image.shape
-            top   = random.randint(0, h - self.new_h)
-            left  = random.randint(0, w - self.new_w)
-            image   = image[top:top + self.new_h, left:left + self.new_w]
-            gt_image = gt_image[top:top + self.new_h, left:left + self.new_w]
-            gt_map = gt_map[top:top + self.new_h, left:left + self.new_w]
+        # if self.crop:
+        #     h, w, _ = image.shape
+        #     top   = random.randint(0, h - self.new_h)
+        #     left  = random.randint(0, w - self.new_w)
+        #     image   = image[top:top + self.new_h, left:left + self.new_w]
+        #     gt_image = gt_image[top:top + self.new_h, left:left + self.new_w]
+        #     gt_map = gt_map[top:top + self.new_h, left:left + self.new_w]
 
-        if random.random() < self.flip_rate:
-            image   = np.fliplr(image)
-            gt_image = np.fliplr(gt_image)
-            gt_map = np.fliplr(gt_map)
+        # if random.random() < self.flip_rate:
+        #     image   = np.fliplr(image)
+        #     gt_image = np.fliplr(gt_image)
+        #     gt_map = np.fliplr(gt_map)
 
         gt_image = gt_image.transpose((2,0,1))
         gt_image = gt_image.astype("float")
         image = Image.fromarray(image) # convert to PIL image(Pytorch default image datatype)
-        print(image)
         sample = {'image': image.copy(), 'label': torch.from_numpy(gt_image.copy()), 'gt_map':torch.from_numpy(gt_map.copy())}
 
         if self.transform:
@@ -90,6 +89,7 @@ def load_Kitti(batch_size, split=True):
 
     data_transforms = {
         'train_x': transforms.Compose([
+            transforms.Resize((160,576)),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
