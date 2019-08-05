@@ -24,7 +24,7 @@ parser.add_argument('--output_dir', type=str, required=True,
                     help='output directory for test inference')
 parser.add_argument('--model', type=str, default='vgg19',
                     help='model architecture to be used for FCN')
-parser.add_argument('--epochs', type=int, default=500,
+parser.add_argument('--epochs', type=int, default=150,
                     help='num of training epochs')
 parser.add_argument('--n_class', type=int, default=2,
                     help='number of label classes')
@@ -85,7 +85,7 @@ def train(n_epoch, trainloader, val_loader):
                 running_loss = 0.0
         # validation
         ious = val(model, val_loader, epoch)
-        if ious[1] > best_road_iou and epoch > 150: # save model for best road iou
+        if ious[1] > best_road_iou: # save model for best road iou
             best_road_iou = ious[1]
             save_model(model,name='best_seg.cpt')
             print("save best model")
