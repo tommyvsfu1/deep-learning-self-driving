@@ -11,8 +11,7 @@ import numpy as np
 import os
 import argparse
 from kitti_loader import load_Kitti, load_Kitti_test
-from utils import save_inference_samples, save_model, load_model, eval_image
-from data.devkit_road.python.helper import evalExp, pxEval_maximizeFMeasure
+from utils import save_inference_samples, save_model, load_model
 from scipy.misc import imread
 import sys
 np.set_printoptions(threshold=sys.maxsize)
