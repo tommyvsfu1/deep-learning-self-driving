@@ -46,19 +46,17 @@ class KittiDataset(Dataset):
         img_name = os.path.join(image_prefix,image_name)
         image = imread(img_name) # read as np.array
 
-
         background_color = np.array([255, 0, 0])
         gt_name = os.path.join(gt_prefix,gt_name)
         # gt_image = scipy.misc.imread(gt_name)
         gt_image = imread(gt_name)
-        gt_image = cv2.resize(gt_image, (160,576))
+        gt_image = cv2.resize(gt_image, (576,160))
         gt_bg = np.all(gt_image == background_color, axis=2) # get backgroud feature map
         gt_bg = gt_bg.reshape(*gt_bg.shape, 1)  # expand dim
         # get ground truth
         # tricks: since we only want 2 class (background and road)
         # so use invert(background), we can get road feature map
         gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2) 
-
         # gt_image = Image.fromarray(gt_image)
         gt_map = np.invert(gt_bg) 
 
@@ -95,7 +93,6 @@ def load_Kitti(batch_size, split=True):
         ])
     }
     dataset = KittiDataset('data/train.csv','data/data_road/training/',transform=data_transforms)
-
 
     if split:
         train_dataloader, val_dataloader = datasetSplit(dataset=dataset, train_batch_size=batch_size)
@@ -177,3 +174,4 @@ def load_Kitti_test(batch_size):
 
 
 
+load_Kitti(1)
