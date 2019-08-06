@@ -15,4 +15,5 @@ for now:
 4. use video_capture.py to calculate fps  
 5. use video_capture.py to generate video  
 
+(use generate.sh)
 
