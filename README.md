@@ -1,6 +1,6 @@
 # deep-learning-self-driving
 <img src="raw_result/gif/1.gif" height="200">
-
+<img src="raw_result/gif/2.gif" height="400">
 
 TODO:  
 1.train/ testing / raw_testing option  

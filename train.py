@@ -175,7 +175,7 @@ def raw_testing():
     # kitti_test_loader = load_Kitti_test(batch_size=1)
     kitti_raw_test_loader = load_Kitti_raw_test(batch_size=1)
     print("Starting inference...")
-    test_folder = "raw_test/2011_09_26/2011_09_26_drive_0002_sync/image_02/data/"
+    test_folder = "raw_test/purpose/image_02/data/"
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
     save_inference_samples(args.output_dir, kitti_raw_test_loader,

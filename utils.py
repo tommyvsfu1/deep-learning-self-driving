@@ -101,17 +101,22 @@ def gen_test_output(n_class, testloader, model, test_folder):
             raw_image = image = scipy.misc.imresize(scipy.misc.imread(image_file), (160,576))
             mask = np.dot(segmentation, np.array([[0, 255, 255, 127]]))
             mask = scipy.misc.toimage(mask, mode="RGBA")
+            
             street_im = scipy.misc.toimage(raw_image)
             street_im.paste(mask, box=None, mask=mask)
             test_paths = sorted(get_test_paths(test_folder))
             output = np.array(street_im)
+
             yield test_paths[i], output
 
 def save_inference_samples(output_dir, testloader, model, test_folder):
     print('Saving test images to: {}'.format(output_dir))
     image_outputs = gen_test_output(2, testloader, model, test_folder)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
     for name, image in image_outputs:
-        plt.imsave(os.path.join(output_dir, name), image)
+        idx = int(str(name.split('.')[0]))
+        plt.imsave(os.path.join(output_dir, 'output'+str(idx)+'.png'), image)
 
 def save_model(model, name='seg.cpt', save_path='./checkpoint/'):
     print('save model to', save_path)
@@ -123,9 +128,9 @@ def save_model(model, name='seg.cpt', save_path='./checkpoint/'):
 def load_model(model, load_path='./checkpoint/pretrained/'):
     print('load model from', load_path)
     if torch.cuda.is_available():
-        model.load_state_dict(torch.load(load_path + 'seg.cpt'))
+        model.load_state_dict(torch.load(load_path + 'best_seg.cpt'))
     else:
-        model.load_state_dict(torch.load(load_path + 'seg.cpt', map_location=lambda storage, loc: storage))
+        model.load_state_dict(torch.load(load_path + 'best_seg.cpt', map_location=lambda storage, loc: storage))
     return model
 
 def get_csv_test_file(data_folder):
@@ -141,4 +146,4 @@ def get_csv_test_file(data_folder):
             writer.writerow([os.path.basename(image)])
 
 
-# get_csv_test_file('/Users/tommy/self-driving/raw_test/2011_09_26/2011_09_26_drive_0002_sync/image_02/data/')
+# get_csv_test_file('/Users/tommy/self-driving/raw_test/purpose/image_02/data/')

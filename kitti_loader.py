@@ -187,8 +187,8 @@ def load_Kitti_raw_test(batch_size):
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
 
-    dataset = KittiTestDataset('raw_test/2011_09_26/2011_09_26_drive_0002_sync/image_02/raw_test.csv',
-                                'raw_test/2011_09_26/2011_09_26_drive_0002_sync/image_02/data/',transform=data_transforms)
+    dataset = KittiTestDataset('raw_test/purpose/image_02/raw_test.csv',
+                                'raw_test/purpose/image_02/data/',transform=data_transforms)
 
     dataloader = DataLoader(dataset, batch_size=batch_size,
                         shuffle=False, num_workers=4)

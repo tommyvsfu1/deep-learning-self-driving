@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import glob
-    
+import os
 def vis_segmentation_stream(image, index):
     """Visualizes segmentation overlay view and stream it with IPython display."""
     plt.figure(figsize=(12, 7))
@@ -67,8 +67,11 @@ def read_time_stamp(file_name):
     return fps
 
 def output_video(fps):
+    id_array = []
     img_array = []
-    for filename in sorted(glob.glob('./raw_result/*.png')):
+
+    for filename in sorted( glob.glob('./raw_test/purpose/result3/*.png'),
+                key=lambda s: int((((os.path.basename(s).split('.')[0])).split('t'))[2])):
         img = cv2.imread(filename)
         height, width, layers = img.shape
         size = (width,height)
@@ -81,5 +84,5 @@ def output_video(fps):
         out.write(img_array[i])
     out.release()
 
-fps = read_time_stamp("./raw_test/2011_09_26/2011_09_26_drive_0002_sync/image_02/timestamps.txt")
-output_video(fps)
+# fps = read_time_stamp("./raw_test/2011_09_26/2011_09_26_drive_0002_sync/image_02/timestamps.txt")
+output_video(15)
