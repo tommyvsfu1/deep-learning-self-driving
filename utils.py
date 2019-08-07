@@ -41,7 +41,7 @@ def get_label_paths(label_path):
 def get_test_paths(test_path):
     test_paths = [os.path.basename(path)
                       for path in glob(os.path.join(test_path, '*.png'))]
-
+    print("test_paths", test_paths)
     return test_paths
 
 def make_layers(cfg, batch_norm=False):
@@ -77,7 +77,7 @@ def make_layers(cfg, batch_norm=False):
 #     return FN, FP, posNum, negNum
 
 
-def gen_test_output(n_class, testloader, model, test_folder):
+def gen_test_output(n_class, img_size, testloader, model, test_folder):
     model.eval();
     with torch.no_grad():
         for i, data in enumerate(testloader):
@@ -98,7 +98,7 @@ def gen_test_output(n_class, testloader, model, test_folder):
 
 
             image_file = data['name'][0]
-            raw_image = image = scipy.misc.imresize(scipy.misc.imread(image_file), (160,576))
+            raw_image = image = scipy.misc.imresize(scipy.misc.imread(image_file), img_size)
             mask = np.dot(segmentation, np.array([[0, 255, 255, 127]]))
             mask = scipy.misc.toimage(mask, mode="RGBA")
             
@@ -109,9 +109,9 @@ def gen_test_output(n_class, testloader, model, test_folder):
 
             yield test_paths[i], output
 
-def save_inference_samples(output_dir, testloader, model, test_folder):
+def save_inference_samples(output_dir, img_size, testloader, model, test_folder):
     print('Saving test images to: {}'.format(output_dir))
-    image_outputs = gen_test_output(2, testloader, model, test_folder)
+    image_outputs = gen_test_output(2, img_size, testloader, model, test_folder)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     for name, image in image_outputs:

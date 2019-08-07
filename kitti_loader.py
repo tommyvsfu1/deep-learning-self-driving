@@ -90,16 +90,19 @@ class KittiDataset(Dataset):
 
         return sample
 
-def load_Kitti(batch_size, split=True):
+def load_Kitti(load_path, train_img_size, batch_size, split=True):
 
     data_transforms = {
         'train_x': transforms.Compose([
-            transforms.Resize((160,576)),
+            transforms.Resize(train_img_size),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
     }
-    dataset = KittiDataset('data/train.csv','data/data_road/training/',transform=data_transforms)
+    dataset = KittiDataset(load_path+'train.csv',load_path+'data_road/training/',transform=data_transforms)
+    """ Should be
+    KittiDataset('data/train.csv','data/data_road/training/',transform=data_transforms)
+    """
 
     if split:
         train_dataloader, val_dataloader = datasetSplit(dataset=dataset, train_batch_size=batch_size)
@@ -179,16 +182,16 @@ def load_Kitti_test(batch_size):
 
     return dataloader
 
-def load_Kitti_raw_test(batch_size):
+def load_Kitti_raw_test(load_path, img_size, batch_size):
 
     data_transforms = transforms.Compose([
-            transforms.Resize((160,576)),
+            transforms.Resize(img_size),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
 
-    dataset = KittiTestDataset('raw_test/purpose/image_02/raw_test.csv',
-                                'raw_test/purpose/image_02/data/',transform=data_transforms)
+    dataset = KittiTestDataset(load_path+'raw_test.csv',
+                               load_path+'data/',transform=data_transforms)
 
     dataloader = DataLoader(dataset, batch_size=batch_size,
                         shuffle=False, num_workers=4)

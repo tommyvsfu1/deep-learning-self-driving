@@ -2,6 +2,56 @@
 <img src="raw_result/gif/1.gif" height="200">
 <img src="raw_result/gif/2.gif" height="200">
 
+
+## Segmentation Training
+### data
+use KITTI road data (I only use these for training), so this training will not change
+### file form:
+```
+./data
+    |train.csv
+    |test.csv
+    |data_road/
+```
+### how to run?
+```python
+python train --input_dir=<> --train_img_size=<> output_dir=<>
+```
+>- input_dir='./data/' (for loader to load csv, and training data)
+>- train_img_size=160,576
+>- output_dir=<fill in>
+### Where does model save
+```
+./checkpoint
+```
+## Segmentation Evaluation
+### data
+KITTI raw data or testing
+### how to run?
+```python
+python eval.py --input_dir=<> --test_img_size=<> output_dir=<>
+```
+Sample:
+```
+python eval.py --input_dir='./raw_test/purpose/image_02/' --test_img_size=256,1024 --output_dir='./this_is_test'
+```
+>- input_dir='./data/' (for loader to load csv, and training data)
+>- train_img_size=256,1024
+>- output_dir=<fill in>
+
+### model load from
+```
+./checkpoint/pretrained/best_seg.cpt
+```
+
+## Detection with Segemtation Evaluation
+### data
+KITTI raw data or testing
+
+
+
+
+
 TODO:  
 1.train/ testing / raw_testing option  
 2.csv generator  (now in utils)
@@ -17,3 +67,17 @@ for now:
 
 (use generate.sh)
 
+
+
+## ignore
+data/data_road/ -> KITTI road data
+data/training_mapping/ -> no use
+data/devkit_road/ -> no use
+data/data_road.zip -> no use
+reference_code/ 
+result/ -> no use
+__pycache__/ -> no use
+nohup.out -> no use
+scores/ -> no use
+raw_test/ -> KITTI raw data
+raw_result/raw/ -> KITTI raw data result

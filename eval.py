@@ -21,8 +21,8 @@ np.random.seed(1234)
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--input_dir', type=str, required=True)
-parser.add_argument('--train_img_size', type=str, required=True,
-                    help='resize size before into training network')
+parser.add_argument('--test_img_size', type=str, required=True,
+                    help='resize size before into network')
 parser.add_argument('--output_dir', type=str, required=True,
                     help='output directory for test inference')
 
@@ -161,39 +161,24 @@ def run():
     print("Completed training!")
     save_model(model)
 
-def testing():
-    vgg_model = VGGNet(requires_grad=True, remove_fc=True)
-    model = FCNs(pretrained_net=vgg_model, n_class=2).to(device)
-    model = load_model(model)
-    kitti_test_loader = load_Kitti_test(batch_size=1)
-    print("Starting inference...")
-    test_folder = "data/data_road/testing/image_2/"
-    if not os.path.exists(args.output_dir):
-        os.makedirs(args.output_dir)
-    save_inference_samples(args.output_dir, kitti_test_loader,
-                            model, test_folder)
-    print("Inference completed!")
+
 
 def raw_testing():
     vgg_model = VGGNet(requires_grad=True, remove_fc=True)
     model = FCNs(pretrained_net=vgg_model, n_class=2).to(device)
     model = load_model(model)
-    # kitti_test_loader = load_Kitti_test(batch_size=1)
-    kitti_raw_test_loader = load_Kitti_raw_test(batch_size=1)
+    test_folder = args.input_dir
+    test_data_folder = test_folder + 'data/'
+    print("test_folder", test_folder)
+    img_size = (int(args.test_img_size.split(',')[0]),int(args.test_img_size.split(',')[1]))
+    kitti_raw_test_loader = load_Kitti_raw_test(load_path=test_folder,img_size=img_size,batch_size=1)
     print("Starting inference...")
-    test_folder = "raw_test/purpose/image_02/data/"
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
-    save_inference_samples(args.output_dir, kitti_raw_test_loader,
-                            model, test_folder)
+    save_inference_samples(args.output_dir, img_size, kitti_raw_test_loader,
+                            model, test_data_folder)
     print("Inference completed!")
 
 if __name__ == "__main__":
-
-    # train data
-    run()
-    # test data
-    # testing()
-
     # # test 'raw' video data
-    # raw_testing()
+    raw_testing()
