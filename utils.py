@@ -10,9 +10,14 @@ import numpy as np
 from skimage import io, transform
 import matplotlib.pyplot as plt
 import scipy.misc
+import argparse
 
 np.random.seed(1234)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+
+
 
 def normalize(img, mean, std):
     img = img/255.0
@@ -133,17 +138,4 @@ def load_model(model, load_path='./checkpoint/pretrained/'):
         model.load_state_dict(torch.load(load_path + 'best_seg.cpt', map_location=lambda storage, loc: storage))
     return model
 
-def get_csv_test_file(data_folder):
-    image_paths = sorted(glob(os.path.join(data_folder, '*.png')))
 
-    import csv
-
-    # 開啟輸出的 CSV 檔案
-    with open('raw_test.csv', 'w', newline='') as csvfile:
-        # 建立 CSV 檔寫入器
-        writer = csv.writer(csvfile)
-        for image in image_paths:
-            writer.writerow([os.path.basename(image)])
-
-
-# get_csv_test_file('/Users/tommy/self-driving/raw_test/purpose/image_02/data/')

@@ -48,7 +48,12 @@ python eval.py --input_dir='./raw_test/purpose/image_02/' --test_img_size=256,10
 ### data
 KITTI raw data or testing
 
-
+### run
+```
+cd reference_code/PyTorch-YOLOv3/
+python detect_seg.py --mask_folder='../../raw_test/purpose/result2/' --image_folder='../../raw_test/purpose/result1/' --output_folder='../../segdect/'
+```
+## Video
 
 
 
