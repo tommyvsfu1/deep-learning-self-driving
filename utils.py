@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 import scipy.misc
 # import argparse
 
-# np.random.seed(1234)
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+np.random.seed(1234)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 
@@ -43,11 +43,13 @@ import scipy.misc
 
 #     return label_paths
 
-# def get_test_paths(test_path):
-#     test_paths = [os.path.basename(path)
-#                       for path in glob(os.path.join(test_path, '*.png'))]
-#     print("test_paths", test_paths)
-#     return test_paths
+def get_test_paths(test_path):
+    test_paths = [os.path.basename(path)
+                      for path in glob(os.path.join(test_path, '*.png'))]
+    # print("test_paths", test_paths)
+    paths = glob.glob(test_paths,
+                key=lambda s: int((((os.path.basename(s).split('.')[0])).split('t'))[2]))
+    return paths
 
 # def make_layers(cfg, batch_norm=False):
 #     layers = []
@@ -109,7 +111,7 @@ def gen_test_output(n_class, img_size, testloader, model, test_folder):
             
             street_im = scipy.misc.toimage(raw_image)
             street_im.paste(mask, box=None, mask=mask)
-            test_paths = sorted(get_test_paths(test_folder))
+            test_paths = get_test_paths(test_folder)
             output = np.array(street_im)
 
             yield test_paths[i], output
@@ -120,8 +122,8 @@ def save_inference_samples(output_dir, img_size, testloader, model, test_folder)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     for name, image in image_outputs:
-        idx = int(str(name.split('.')[0]))
-        plt.imsave(os.path.join(output_dir, 'output'+str(idx)+'.png'), image)
+        # idx = int(str(name.split('t')[2]))
+        plt.imsave(os.path.join(output_dir, name), image)
 
 def save_model(model, name='seg.cpt', save_path='./checkpoint/'):
     print('save model to', save_path)

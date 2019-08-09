@@ -2,6 +2,17 @@ import cv2
 import numpy as np
 import glob
 import os
+import argparse
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('--input_dir', type=str, required=True)
+parser.add_argument('--fps', type=str, required=True,
+                    help='output directory for test inference')
+parser.add_argument('--output_dir', type=str, required=True,
+                    help='output directory for test inference')
+
+args = parser.parse_args()
 def vis_segmentation_stream(image, index):
     """Visualizes segmentation overlay view and stream it with IPython display."""
     plt.figure(figsize=(12, 7))
@@ -66,11 +77,11 @@ def read_time_stamp(file_name):
     print("fps", fps)
     return fps
 
-def output_video(fps):
+def output_video(args):
     id_array = []
     img_array = []
 
-    for filename in sorted( glob.glob('./raw_test/purpose/result3/*.png'),
+    for filename in sorted( glob.glob(args.input_dir + '*.png'),
                 key=lambda s: int((((os.path.basename(s).split('.')[0])).split('t'))[2])):
         img = cv2.imread(filename)
         height, width, layers = img.shape
@@ -78,11 +89,11 @@ def output_video(fps):
         img_array.append(img)
     
     
-    out = cv2.VideoWriter('project.mp4',cv2.VideoWriter_fourcc(*'MP4V'), fps, size)
+    out = cv2.VideoWriter(args.output_dir+'project.mp4',cv2.VideoWriter_fourcc(*'MP4V'), int(args.fps), size)
     
     for i in range(len(img_array)):
         out.write(img_array[i])
     out.release()
 
 # fps = read_time_stamp("./raw_test/2011_09_26/2011_09_26_drive_0002_sync/image_02/timestamps.txt")
-output_video(15)
+output_video(args)

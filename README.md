@@ -55,6 +55,17 @@ python detect_seg.py --mask_folder='../../raw_test/purpose/result2/' --image_fol
 ```
 ## Video
 
+### run
+```python
+python video_capture.py --input_dir=<> --fps=<> --output_dir=<>
+```
+sample:
+```python
+python video_capture.py --input_dir='./raw_test/purpose/result3/' --fps=15 --output_dir='./'
+```
+
+
+### ALL IN ONE
 
 
 TODO:  

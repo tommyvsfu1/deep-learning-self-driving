@@ -1,7 +1,7 @@
 
 import argparse
 import os
-
+from glob import glob
 def get_csv_test_file(data_folder):
     image_paths = sorted(glob(os.path.join(data_folder, '*.png')))
 

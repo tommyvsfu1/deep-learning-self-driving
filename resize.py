@@ -10,7 +10,6 @@ from PIL import Image
 import glob
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 import os
 
 def resize(image, size):
@@ -34,7 +33,6 @@ class ImageFolder(Dataset):
 
     def __len__(self):
         return len(self.files)
-
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_folder", type=str, required=True,help="path to checkpoint model")
 parser.add_argument("--img_size", type=str, required=True,help="path to checkpoint model")
