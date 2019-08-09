@@ -10,60 +10,60 @@ import numpy as np
 from skimage import io, transform
 import matplotlib.pyplot as plt
 import scipy.misc
-import argparse
+# import argparse
 
-np.random.seed(1234)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
+# np.random.seed(1234)
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 
-def normalize(img, mean, std):
-    img = img/255.0
-    img[0] = (img[0] - mean[0]) / std[0]
-    img[1] = (img[1] - mean[1]) / std[1]
-    img[2] = (img[2] - mean[2]) / std[2]
-    img = np.clip(img, 0.0, 1.0)
 
-    return img
 
-def denormalize(img, mean, std):
-    img[0] = (img[0] * std[0]) + mean[0]
-    img[1] = (img[1] * std[1]) + mean[1]
-    img[2] = (img[2] * std[2]) + mean[2]
-    img = img * 255
+# def normalize(img, mean, std):
+#     img = img/255.0
+#     img[0] = (img[0] - mean[0]) / std[0]
+#     img[1] = (img[1] - mean[1]) / std[1]
+#     img[2] = (img[2] - mean[2]) / std[2]
+#     img = np.clip(img, 0.0, 1.0)
 
-    img = np.clip(img, 0, 255)
-    return img
+#     return img
 
-def get_label_paths(label_path):
-    label_paths = {re.sub(r'_(lane|road)_', '_', os.path.basename(path)): path
-                   for path in glob(os.path.join(label_path, '*_road_*.png'))}
+# def denormalize(img, mean, std):
+#     img[0] = (img[0] * std[0]) + mean[0]
+#     img[1] = (img[1] * std[1]) + mean[1]
+#     img[2] = (img[2] * std[2]) + mean[2]
+#     img = img * 255
 
-    return label_paths
+#     img = np.clip(img, 0, 255)
+#     return img
 
-def get_test_paths(test_path):
-    test_paths = [os.path.basename(path)
-                      for path in glob(os.path.join(test_path, '*.png'))]
-    print("test_paths", test_paths)
-    return test_paths
+# def get_label_paths(label_path):
+#     label_paths = {re.sub(r'_(lane|road)_', '_', os.path.basename(path)): path
+#                    for path in glob(os.path.join(label_path, '*_road_*.png'))}
 
-def make_layers(cfg, batch_norm=False):
-    layers = []
-    in_channels = 3
-    for v in cfg:
-        if v == 'M':
-            layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
-        else:
-            conv2d = nn.Conv2d(in_channels, v, kernel_size=3, padding=1)
-            if batch_norm:
-                layers += [conv2d, nn.BatchNorm2d(v), nn.ReLU(inplace=True)]
-            else:
-                layers += [conv2d, nn.ReLU(inplace=True)]
-            in_channels = v
+#     return label_paths
 
-    return nn.Sequential(*layers)
+# def get_test_paths(test_path):
+#     test_paths = [os.path.basename(path)
+#                       for path in glob(os.path.join(test_path, '*.png'))]
+#     print("test_paths", test_paths)
+#     return test_paths
+
+# def make_layers(cfg, batch_norm=False):
+#     layers = []
+#     in_channels = 3
+#     for v in cfg:
+#         if v == 'M':
+#             layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
+#         else:
+#             conv2d = nn.Conv2d(in_channels, v, kernel_size=3, padding=1)
+#             if batch_norm:
+#                 layers += [conv2d, nn.BatchNorm2d(v), nn.ReLU(inplace=True)]
+#             else:
+#                 layers += [conv2d, nn.ReLU(inplace=True)]
+#             in_channels = v
+
+#     return nn.Sequential(*layers)
 
 # def eval_image(gt_image, cnn_image):
 #     """."""
@@ -139,3 +139,5 @@ def load_model(model, load_path='./checkpoint/pretrained/'):
     return model
 
 
+if __name__ == '__main__':
+    pass

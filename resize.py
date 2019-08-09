@@ -18,7 +18,7 @@ def resize(image, size):
     return image
 
 class ImageFolder(Dataset):
-    def __init__(self, folder_path, img_size=(160,576)):
+    def __init__(self, folder_path, img_size):
         self.files = sorted(glob.glob("%s/*.*" % folder_path))
         self.img_size = img_size
 
@@ -36,16 +36,19 @@ class ImageFolder(Dataset):
         return len(self.files)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--image_folder", type=str, required=True,help="path to checkpoint model")
-parser.add_argument("--out_folder", type=str, required=True,help="path to checkpoint model")
+parser.add_argument("--input_folder", type=str, required=True,help="path to checkpoint model")
+parser.add_argument("--img_size", type=str, required=True,help="path to checkpoint model")
+parser.add_argument("--output_folder", type=str, required=True,help="path to checkpoint model")
 
 opt = parser.parse_args()
 
-if not os.path.exists(opt.out_folder):
-    os.makedirs(opt.out_folder)
+if not os.path.exists(opt.output_folder):
+    os.makedirs(opt.output_folder)
+
+img_size = (int(opt.img_size.split(',')[0]),int(opt.img_size.split(',')[1]))
 
 dataloader = DataLoader(
-    ImageFolder(opt.image_folder, img_size=(160,576)),
+    ImageFolder(opt.input_folder, img_size=img_size),
     batch_size=1,
     shuffle=False,
     num_workers=4,
@@ -55,4 +58,4 @@ for batch_i, (img_paths, input_imgs) in enumerate(dataloader):
     img = input_imgs.numpy()
     img = (img[0]).transpose((1,2,0))
     img = (img*255).astype(np.uint8)
-    cv2.imwrite(opt.out_folder+'output'+str(batch_i)+'.png', cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
+    cv2.imwrite(opt.output_folder+'output'+str(batch_i)+'.png', cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
